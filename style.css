@@ -90,3 +90,35 @@ html, body {
     width: 100%;
     overflow: hidden;
 }
+
+		  /* unvisited link */
+a:link {
+  color: black;
+  text-decoration: none;
+}
+
+/* visited link */
+a:visited {
+  color: black;
+  text-decoration: none;
+}
+
+/* mouse over link */
+a:hover {
+  color: white;
+  text-decoration: none;
+}
+
+/* selected link */
+a:active {
+  color: black;
+  text-decoration: none;
+  
+}
+.vericaltext{
+ 			position:fixed; text-align: right; left: 30%; right:20px; top:50px; font-style: italic;
+	}
+
+				
+
+			div.block {
