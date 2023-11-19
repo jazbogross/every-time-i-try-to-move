@@ -37,15 +37,15 @@
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: is my body not moving</p></li>
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: ruins?</p></li>
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: now is not the time to give up on your loved ones</p></li>
-            <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: moving through time</p></li>
+            <li><p class="highlighted"><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: moving through time</p></li>
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: I am a fragment</p></li>
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: of a</p></li>
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: we</p></li>
-            <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: we are</p></li>
-            <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: unstable</p></li>
-            <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: connections</p></li>
-            <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: hearts</p></li> 
-            <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: beating</p></li> 
+            <li><p class="highlighted"><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: we are</p></li>
+            <li><p class="highlighted"><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: unstable</p></li>
+            <li><p class="highlighted"><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: connections</p></li>
+            <li><p class="highlighted"><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: hearts</p></li> 
+            <li><p class="highlighted"><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: beating</p></li> 
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: to the same</p></li>
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: lost</p></li>
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: pixels</p></li>
@@ -103,78 +103,98 @@
 </div>
 
 <script>
-const html = document.querySelector('html');
-const canvas = document.getElementById('canvas');
-const welcomeScreen = document.getElementById('welcome-screen');
-const video = document.createElement('video');
-const vimeoContainer = document.querySelector('#vimeo-container');
-const fullscreenBtn = document.getElementById('fullscreenBtn');
-const vimeoID = '878938745';
-let domHeight = window.innerHeight;
-let domWidth = window.innerWidth;
-let visibleTime = 0;
-let randomNumber = 50;
-let vimeoVisible = false;
-let canvasVisible = true;
-let lastTimeUpdate = Date.now();
-let isBuffering = false;
+const SELECTORS = {
+    HTML: 'html',
+    CANVAS: '#canvas',
+    WELCOME_SCREEN: '#welcome-screen',
+    VIMEO_CONTAINER: '#vimeo-container',
+    FULLSCREEN_BTN: '#fullscreenBtn',
+    ENTER_PERFORMANCE: '#enterPerformance',
+    CONTAINER: '#container',
+    BACKGROUND: '#background',
+    SCRIPT: '#text-container'
+};
 
-vimeoContainer.style.display = 'none';
-canvas.style.display = 'block';
-video.setAttribute.autoplay;
-video.setAttribute.muted;
-
-const vimeoOptions = {
-    id: vimeoID,
-    width: domWidth,
+const VIMEO_ID = '878938745';
+const UPDATE_INTERVAL = 2000; // 2 seconds
+const INITIAL_RANDOM_NUMBER = 50;
+const VIMEO_OPTIONS = {
+    id: VIMEO_ID,
+    width: window.innerWidth,
     loop: true,
-    controls: false, // Hide controls
+    controls: false,
     autoplay: true,
     muted: true
 };
 
-const vimeoPlayer = new Vimeo.Player(vimeoContainer, vimeoOptions);
+let domSize = { height: window.innerHeight, width: window.innerWidth };
+let state = {
+    visibleTime: 0,
+    randomNumber: INITIAL_RANDOM_NUMBER,
+    vimeoVisible: false,
+    canvasVisible: true,
+    lastTimeUpdate: Date.now(),
+    isBuffering: false
+};
 
-vimeoPlayer.on('play', function() {
-    vimeoContainer.style.display = 'block';
-});
+const elements = {
+    html: document.querySelector(SELECTORS.HTML),
+    canvas: document.getElementById(SELECTORS.CANVAS.slice(1)),
+    welcomeScreen: document.getElementById(SELECTORS.WELCOME_SCREEN.slice(1)),
+    vimeoContainer: document.querySelector(SELECTORS.VIMEO_CONTAINER),
+    background: document.querySelector(SELECTORS.BACKGROUND),
+    script: document.querySelector(SELECTORS.SCRIPT),
+    video: document.createElement('video'),
+    vimeoPlayer: null // Initialized later
+};
 
-vimeoPlayer.on('timeupdate', function(data) {
-  const now = Date.now();
-  const timeSinceLastUpdate = now - lastTimeUpdate;
+// Initialize styles
+elements.vimeoContainer.style.display = 'none';
+elements.canvas.style.display = 'block';
+elements.video.autoplay = true;
+elements.video.muted = true;
+elements.vimeoPlayer = new Vimeo.Player(elements.vimeoContainer, VIMEO_OPTIONS);
 
-  if (timeSinceLastUpdate > 2000) { // 2000 milliseconds or 2 seconds
-    if (!isBuffering) {
-      isBuffering = true;
-      vimeoContainer.style.display = 'none';
+// Event Listeners
+document.getElementById(SELECTORS.ENTER_PERFORMANCE.slice(1)).addEventListener('click', setupCamera);
+document.getElementById(SELECTORS.CONTAINER.slice(1)).addEventListener('scroll', infinityScroll);
+
+// Function declarations
+function setupVimeoPlayer() {
+    elements.vimeoPlayer.on('play', () => elements.vimeoContainer.style.display = 'block');
+    elements.vimeoPlayer.on('timeupdate', handleTimeUpdate);
+}
+
+function handleTimeUpdate() {
+    const now = Date.now();
+    const timeDiff = now - state.lastTimeUpdate;
+
+    if (timeDiff > UPDATE_INTERVAL) {
+        state.isBuffering = !state.isBuffering;
+        elements.vimeoContainer.style.display = state.isBuffering ? 'none' : 'block';
     }
-  } else {
-    if (isBuffering) {
-      isBuffering = false;
-      vimeoContainer.style.display = 'block';
-    }
-  }
 
-  lastTimeUpdate = now;
-});
+    state.lastTimeUpdate = now;
+}
 
 async function setupCamera() {
+  elements.welcomeScreen.style.display = "none";
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: 'user' },
     });
-    video.srcObject = stream;
-    video.muted = true; // Mute the video
-    video.playsInline = true; // Allows inline playback
-    video.addEventListener('loadedmetadata', () => {
-      video.play(); // Play video after metadata has loaded
+    elements.video.srcObject = stream;
+    elements.video.muted = true; // Mute the video
+    elements.video.playsInline = true; // Allows inline playback
+    elements.video.addEventListener('loadedmetadata', () => {
+    elements.video.play(); // Play video after metadata has loaded
     });
 
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     console.log('ctx: ' + ctx);
     const draw = () => {
 //    console.log("Draw function called");
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(elements.video, 0, 0, canvas.width, canvas.height);
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
       const threshold = 40;
@@ -201,8 +221,8 @@ async function setupCamera() {
   }
 }
 
-async function infinityScroll() {
-    document.addEventListener( "DOMContentLoaded", function() {
+function infinityScroll(event) {
+  document.addEventListener( "DOMContentLoaded", function() {
     console.log('DOM Content loaded. Yayyyyy')
     var div = document.getElementById( "container" );
     div.addEventListener( "scroll", function() {
@@ -227,9 +247,16 @@ const turnOffLights = (minuteToRun) => {
     const date = new Date();
     if (date.getMinutes() === minuteToRun && date.getSeconds() === 0) {
       console.log(`Triggered at ${date}`);
-      html.style.transition = 'all 1s ease';
-      html.style.filter = 'brightness(100%)';
-      html.style.filter = 'brightness(0%)';
+
+
+    elements.background.style.transition = 'all 1s ease';
+    elements.background.style.filter = 'brightness(100%)';
+    elements.background.style.filter = 'brightness(0%)';
+    elements.background.style.zIndex = '999';
+    console.log('background darkened');
+    
+
+
     }
   }, 1000);
 };
@@ -239,21 +266,69 @@ const turnOnLights = (minuteToRun) => {
     const date = new Date();
     if (date.getMinutes() === minuteToRun && date.getSeconds() === 0) {
       console.log(`Triggered at ${date}`);
-      html.style.filter = 'brightness(100%)';
+
+      const highlightedElements = document.querySelectorAll('.highlighted');
+      console.log(highlightedElements);
+      highlightedElements.forEach((element, index) => {
+        // Delay for each element of 1 minute
+        setTimeout(() => {
+          // Set the transition for color change
+          element.style.transition = 'color 2s ease';
+          //Move script in front of BG
+         elements.script.style.zIndex = '1000';
+        // element.style.filter = 'brightness(100%)';
+         // console.log("MADE HIGHLIGHTED WORD BRIGHT");
+         
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          console.log("SCROLLED TO WORD");
+          
+          // Initially set color to black
+          element.style.color = '#000000';
+          console.log("changed to BLACK");
+
+          // Change color to white after a brief moment
+          setTimeout(() => {
+            element.style.color = '#FFFFFF';
+            console.log("changed to WHITE");
+          }, 10); // A brief delay to ensure the transition takes effect
+        }, 60000 * index); // 1 minute apart for each element
+              // After all elements have changed, set zIndex
+      const totalDuration = 60000 * highlightedElements.length + 2000; // Total time + 2 seconds for the last transition
+      setTimeout(() => {
+        if (elements.background) {
+          elements.background.style.zIndex = '-1';
+          elements.background.style.filter = 'brightness(100%)';
+          highlightedElements.forEach((element, index) => {
+            element.style.color = '#000000';
+          });
+        }
+      }, totalDuration);
+      });
     }
   }, 1000);
 };
 
+
 const showVimeo = (x) => {
   setInterval(() => {
     const random100 = Math.random() * 100;
-    if (randomNumber > random100 && vimeoVisible == false) {
-      vimeoContainer.style.display = 'block';
-      vimeoVisible = true;
-      chancePercentage();
-      console.log(randomNumber);
+   // console.log(random100);
+    if (state.randomNumber > random100 && !state.vimeoVisible) {
+      
+      setupVimeoPlayer();
+      elements.vimeoPlayer.loadVideo(VIMEO_ID).then(() => {
+        hideControls();
+        elements.vimeoPlayer.setVolume(0); // Assuming you still want it muted
+        elements.vimeoPlayer.play();
+        elements.vimeoContainer.style.display = 'block';
+        state.vimeoVisible = true;
+        chancePercentage();
+      //  console.log(state.randomNumber);
+      }).catch(error => {
+        console.error("Error loading Vimeo video:", error);
+      });
     } else {
-      console.log(`showVimeo function did not run. Random number ${random100.toFixed(2)} is greater than ${randomNumber} or it was already playing`);
+   //   console.log(`showVimeo function did not run. Random number ${random100.toFixed(2)} is greater than ${state.randomNumber} or it was already playing`);
     }
   }, x * 1000);
 };
@@ -261,92 +336,95 @@ const showVimeo = (x) => {
 const showFace = (x) => {
   setInterval(() => {
     const random100 = Math.random() * 100;
-    if (randomNumber > random100 && canvasVisible == false) {
-        canvas.style.display = 'block';
+    chancePercentage();
+    if (state.randomNumber > random100 && state.canvasVisible == false) {
+        elements.canvas.style.display = 'block';
         console.log("Canvas Initialized");
-        console.log('stream: ' + video.srcObject);
-        canvasVisible = true
+        console.log('stream: ' + elements.video.srcObject);
+        state.canvasVisible = true
     } else {
-      console.log(`showFace function did not run. Random number ${random100.toFixed(2)} is greater than ${randomNumber} OR it was already visible`);
+    //  console.log(`showFace function did not run. Random number ${random100.toFixed(2)} is greater than ${state.randomNumber} OR it was already visible`);
     }
   }, x * 1000);
 };
 
 const hideVideos = (x) => {
   setInterval(() => {
-    if (vimeoVisible || canvasVisible) {
-        visibleTime += x;
-
-        let logProb;
-
-        if (visibleTime <= 60) {
+    if (state.vimeoVisible || state.canvasVisible) {
+      state.visibleTime += x;
+      let logProb;
+        if (state.visibleTime <= 60) {
             // Slowly rising probability in the first minute
-            logProb = 0.05 * visibleTime;
-        } else if (visibleTime <= 240) {
+            logProb = 0.05 * state.visibleTime;
+        } else if (state.visibleTime <= 240) {
             // Faster rise in probability from 5% to 100% between 1 and 4 minutes
-            logProb = 5 + 30 * ((visibleTime - 60) / (240 - 60));
+            logProb = 5 + 30 * ((state.visibleTime - 60) / (240 - 60));
         } else {
             // 100% probability after 4 minutes
             logProb = 100;
         }
 
-        const chanceOfOff = Math.random() * 100;
-        console.log('visible time ' + visibleTime);
-        // console.log('logProb ' + logProb);
-        // console.log('chance that video will turn off ' + chanceOfOff + '%');
+      const chanceOfOff = Math.random() * 100;
+   //   console.log('visible time ' + state.visibleTime);
 
-        if (logProb > chanceOfOff) {
-            canvas.style.display = 'none';
-            vimeoContainer.style.display = 'none';
-            vimeoVisible = false;
-            canvasVisible = false;
-            visibleTime = 0;
-            console.log(`hid the videos`);
-        } else {
-            console.log(`Video(s) running but didn't hide`);
-        }
+      if (logProb > chanceOfOff) {
+        elements.canvas.style.display = 'none';
+        elements.vimeoPlayer.unload().then(() => {
+          elements.vimeoContainer.style.display = 'none';
+          state.vimeoVisible = false;
+          state.canvasVisible = false;
+          state.visibleTime = 0;
+    //      console.log(`hid the videos`);
+        }).catch(error => {
+          console.error("Error unloading Vimeo video:", error);
+        });
+      } else {
+    //    console.log(`Video(s) running but didn't hide`);
+      }
     } else {
-        console.log(`No videos are running`);
-        visibleTime = 0;
+   //   console.log(`No videos are running`);
+      state.visibleTime = 0;
     }
   }, x * 1000);
 };
 
 function hideControls() {
-    vimeoPlayer.getPaused().then(function(paused) {
+    elements.vimeoPlayer.getPaused().then(function(paused) {
         if (!paused) {
-            vimeoPlayer.unload().then(function() {
-                vimeoPlayer.loadVideo(vimeoID).then(function(id) {
-                    vimeoPlayer.setVolume(0);
-                    vimeoPlayer.setControls(false);
-                    vimeoPlayer.play();
+            elements.vimeoPlayer.unload().then(function() {
+                elements.vimeoPlayer.loadVideo(vimeoID).then(function(id) {
+                    elements.vimeoPlayer.setVolume(0);
+                    elements.vimeoPlayer.setControls(false);
+                    elements.vimeoPlayer.play();
                 });
             });
         }
     });
 }
 
-const chancePercentage = () => randomNumber = Math.floor(Math.random() * 51) + 50;
+const chancePercentage = () => {
+  state.randomNumber = Math.floor(Math.random() * 51) + 50;
+};
+
 
 function hideWelcome() {
-  welcomeScreen.style.display = 'none';
-  canvas.style.display = 'none';
-  vimeoContainer.style.display = 'none';
-  vimeoVisible = false;
-  canvasVisible = false;
-  visibleTime = 0;
+  elements.welcomeScreen.style.display = 'none';
+  elements.canvas.style.display = 'none';
+  elements.vimeoContainer.style.display = 'none';
+  state.vimeoVisible = false;
+  state.canvasVisible = false;
+  state.visibleTime = 0;
 }
-
-document.getElementById('enterPerformance').addEventListener('click', setupCamera);
 
 // Initialize
 infinityScroll();
-showVimeo(363);
-showFace(523);
+showVimeo(7);
+showFace(3);
 hideVideos(5);
-turnOffLights(37);
-turnOnLights(40);
-hideControls();
+turnOffLights(56);
+turnOnLights(57);
+
+
 
 
 </script>
