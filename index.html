@@ -46,7 +46,6 @@
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: I am a fragment</p></li>
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: of a</p></li>
             <li><p><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: we</p></li>
-            <li><p class="highlighted"><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: we are</p></li>
             <li><p class="highlighted"><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: unstable</p></li>
             <li><p class="highlighted"><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: connections</p></li>
             <li><p class="highlighted"><a href="https://en.wiktionary.org/wiki/spect-actor" target="_blank">spectactor</a>: hearts</p></li> 
@@ -314,7 +313,6 @@ const turnOnLights = (minuteToRun) => {
   }, 1000);
 };
 
-
 const showVimeo = (x) => {
   setInterval(() => {
     const random100 = Math.random() * 100;
@@ -412,7 +410,6 @@ const chancePercentage = () => {
   state.randomNumber = Math.floor(Math.random() * 51) + 50;
 };
 
-
 function hideWelcome() {
   elements.welcomeScreen.style.display = 'none';
   elements.canvas.style.display = 'none';
@@ -424,14 +421,11 @@ function hideWelcome() {
 
 // Initialize
 infinityScroll();
-showVimeo(230);
-showFace(843);
+showVimeo(5);
+showFace(5);
 hideVideos(5);
 turnOffLights(30);
 turnOnLights(31);
-
-
-
 
 </script>
 
