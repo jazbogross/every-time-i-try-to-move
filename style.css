@@ -115,7 +115,17 @@ a:active {
   text-decoration: none;
   
 }
-.vericaltext{
- 			position:fixed; text-align: right; left: 30%; right:20px; top:50px; font-style: italic; line-height: 2.25; 
+#welcomeText{
+ 			font-size: 28px; 
+      font-style: italic;
+      margin-left: 10vw;
+      margin-right: 10vw;
+      margin-top: 25px;
+      margin-bottom: 25px;
 	}
 
+#enterPerformance {
+  width: 150px;
+  height: 100px;
+  font-size: 18px;
+}
